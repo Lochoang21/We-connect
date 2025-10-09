@@ -9,7 +9,7 @@ export default function LeftSidebar() {
   const fullName = user?.user_metadata?.full_name || 'User';
   const email = user?.email || 'david@gmail.com';
 
-   const initials = fullName
+  const initials = fullName
     .split(' ')
     .filter(Boolean)
     .map((n) => n[0]?.toUpperCase())
@@ -51,7 +51,16 @@ export default function LeftSidebar() {
           <Avatar sx={{ width: 48, height: 48 }}>{initials}</Avatar>
           <Box>
             <Typography variant="body2" fontWeight="600">{fullName}</Typography>
-            <Typography variant="caption" color="text.secondary">{email}</Typography>
+            <Typography variant="caption" color="text.secondary"
+              sx={{
+                display: 'inline-block',
+                maxWidth: 150, // hoặc px tùy ý
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                verticalAlign: 'middle'
+              }}
+            >{email}</Typography>
           </Box>
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
