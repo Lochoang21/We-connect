@@ -1,10 +1,9 @@
-import { Navigate, useLocation } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { CircularProgress, Box } from '@mui/material';
 
-export const ProtectedRoute = ({ children }) => {
+export const PublicRoute = ({ children }) => {
   const { isAuthenticated, isInitialized } = useAuth();
-  const location = useLocation();
 
   // Show loading while checking auth
   if (!isInitialized) {
@@ -22,9 +21,9 @@ export const ProtectedRoute = ({ children }) => {
     );
   }
 
-  // Redirect to login if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+  // Redirect to home if already authenticated
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
   }
 
   return children;

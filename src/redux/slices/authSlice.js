@@ -1,24 +1,12 @@
-// src/store/slices/authSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '@/libs/supabaseClient';
+import { authService } from '@/services/auth.service';
 
-// Async thunks
+// Async thunks - CHỈ gọi service
 export const registerUser = createAsyncThunk(
   'auth/register',
-  async ({ email, password, fullName }, { rejectWithValue }) => {
+  async (credentials, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-
-      if (error) throw error;
-
+      const data = await authService.register(credentials);
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -28,15 +16,9 @@ export const registerUser = createAsyncThunk(
 
 export const loginUser = createAsyncThunk(
   'auth/login',
-  async ({ email, password }, { rejectWithValue }) => {
+  async (credentials, { rejectWithValue }) => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
+      const data = await authService.login(credentials);
       return data;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -48,8 +30,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      await authService.logout();
       return null;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -61,8 +42,7 @@ export const checkAuth = createAsyncThunk(
   'auth/checkAuth',
   async (_, { rejectWithValue }) => {
     try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) throw error;
+      const session = await authService.getSession();
       return session;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -76,6 +56,7 @@ const initialState = {
   loading: false,
   error: null,
   isAuthenticated: false,
+  isInitialized: false, // ✅ Track if auth check completed
 };
 
 const authSlice = createSlice({
@@ -93,6 +74,12 @@ const authSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
+    resetAuth: (state) => {
+      state.user = null;
+      state.session = null;
+      state.isAuthenticated = false;
+      state.error = null;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -147,18 +134,22 @@ const authSlice = createSlice({
       })
       .addCase(checkAuth.fulfilled, (state, action) => {
         state.loading = false;
+        state.isInitialized = true;
         if (action.payload) {
           state.session = action.payload;
           state.user = action.payload.user;
           state.isAuthenticated = true;
+        } else {
+          state.isAuthenticated = false;
         }
       })
       .addCase(checkAuth.rejected, (state) => {
         state.loading = false;
         state.isAuthenticated = false;
+        state.isInitialized = true;
       });
   },
 });
 
-export const { setUser, setSession, clearError } = authSlice.actions;
+export const { setUser, setSession, clearError, resetAuth } = authSlice.actions;
 export default authSlice.reducer;

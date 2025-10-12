@@ -11,13 +11,7 @@ const LoginPage = () => {
   const { control, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+  const { loading, error } = useSelector((state) => state.auth);
 
   useEffect(() => {
     return () => {
@@ -31,9 +25,10 @@ const LoginPage = () => {
         email: data.email,
         password: data.password,
       })).unwrap();
-      // Login successful, user will be redirected by useEffect
+      
+      // ✅ PublicRoute sẽ tự redirect sau khi login success
+      navigate('/');
     } catch (err) {
-      // Error is handled by Redux state
       console.error("Login failed:", err);
     }
   };
@@ -68,9 +63,7 @@ const LoginPage = () => {
           control={control}
           type="password"
           Component={TextInput}
-          rules={{
-            required: "Password is required",
-          }}
+          rules={{ required: "Password is required" }}
         />
         <Button 
           variant="contained" 
@@ -81,7 +74,10 @@ const LoginPage = () => {
         </Button>
       </form>
       <p className="text-center mt-4">
-        New on our platform? <Link to="/register" className="text-primary">Create an account</Link>
+        New on our platform?{" "}
+        <Link to="/register" className="text-primary">
+          Create an account
+        </Link>
       </p>
     </div>
   );

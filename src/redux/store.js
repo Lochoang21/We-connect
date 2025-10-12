@@ -1,17 +1,20 @@
-// src/store/store.js
 import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
+import postReducer from './slices/postSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
+    posts: postReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore these action types
-        ignoredActions: ['auth/login/fulfilled', 'auth/register/fulfilled', 'auth/checkAuth/fulfilled'],
-        // Ignore these paths in the state
+        ignoredActions: [
+          'auth/login/fulfilled',
+          'auth/register/fulfilled',
+          'auth/checkAuth/fulfilled'
+        ],
         ignoredPaths: ['auth.session', 'auth.user'],
       },
     }),

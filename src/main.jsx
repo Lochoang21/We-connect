@@ -12,6 +12,8 @@ import theme from "./configs/muiConfig";
 import RegisterPage from "@pages/auth/RegisterPage";
 import AuthLayout from "@pages/auth/AuthLayout";
 import LoginPage from "@pages/auth/LoginPage";
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { PublicRoute } from '@/components/PublicRoute';
 
 const router = createBrowserRouter([
   {
@@ -19,18 +21,32 @@ const router = createBrowserRouter([
     children: [
       {
         path: "/",
-        element: <HomePage />,
+        element: <ProtectedRoute>
+                <HomePage />
+              </ProtectedRoute>
       },
+      // {
+      //   path: "/profile/:userId",
+      //   element:  <ProtectedRoute>
+      //           <ProfilePage />
+      //         </ProtectedRoute>
+      // },
       {
         element: <AuthLayout />,
         children: [
           {
             path: "/register",
-            element: <RegisterPage />,
+            element: <PublicRoute>
+                <RegisterPage />
+              </PublicRoute>
           },
           {
             path: "/login",
-            element: <LoginPage />,
+            element:
+              <PublicRoute>
+                <LoginPage />
+              </PublicRoute>
+            
           }
         ],
       },
