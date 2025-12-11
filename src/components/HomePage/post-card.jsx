@@ -16,27 +16,21 @@ import {
   Typography, 
   Button,
   Menu,
-  MenuItem,
-  CircularProgress
+  MenuItem
 } from '@mui/material';
 import { useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { toggleLike, deletePost } from '@/redux/slices/postSlice';
 import { formatDistanceToNow } from 'date-fns';
 
 export function PostCard({ post }) {
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   
-
-  // Check if current user liked the post
-  const isLiked = post.likes?.includes(user?.id);
+  // Mock current user
+  const mockCurrentUserId = 'user-1';
+  
   const likesCount = post.likes?.length || 0;
   const commentsCount = post.comments?.length || 0;
 
-  // Format time
   const formatTime = (timestamp) => {
     try {
       return formatDistanceToNow(new Date(timestamp), { addSuffix: true });
@@ -45,50 +39,21 @@ export function PostCard({ post }) {
     }
   };
 
-  // Get author info
-  // const authorName = post.users?.user_metadata?.full_name || 
-  //                    post.users?.email?.split('@')[0] || 
-  //                    'Anonymous';
-  // const authorAvatar = post.users?.user_metadata?.avatar_url;
-   const authorName = post.profiles?.full_name || 'Anonymous';
+  const authorName = post.profiles?.full_name || 'Anonymous';
   const authorAvatar = post.profiles?.avatar_url;
-  const authorId = post.profiles?.id || post.author;
-  // Handle like
-  const handleLike = async () => {
-    if (!user) return;
-    
-    try {
-      await dispatch(toggleLike({ 
-        postId: post._id, 
-        userId: user.id 
-      })).unwrap();
-    } catch (error) {
-      console.error('Failed to like post:', error);
-    }
+  
+  const handleLike = () => {
+    setIsLiked(!isLiked);
+    console.log('Like toggled');
   };
 
-  // Handle delete
-  const handleDelete = async () => {
-    if (!user || !window.confirm('Are you sure you want to delete this post?')) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await dispatch(deletePost({ 
-        postId: post._id, 
-        userId: user.id 
-      })).unwrap();
+  const handleDelete = () => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      console.log('Delete post:', post._id);
       handleCloseMenu();
-    } catch (error) {
-      console.error('Failed to delete post:', error);
-      alert('Failed to delete post');
-    } finally {
-      setLoading(false);
     }
   };
 
-  // Menu handlers
   const handleOpenMenu = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -97,32 +62,10 @@ export function PostCard({ post }) {
     setAnchorEl(null);
   };
 
-  // Check if current user is the author
-  const isAuthor = user?.id === post.author;
-
+  const isAuthor = mockCurrentUserId === post.author;
 
   return (
-    <Paper sx={{ borderRadius: 2, overflow: 'hidden', position: 'relative' }}>
-      {loading && (
-        <Box
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(255, 255, 255, 0.8)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
-
-      {/* Post Header */}
+    <Paper sx={{ borderRadius: 2, overflow: 'hidden' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           <Avatar 
@@ -164,7 +107,6 @@ export function PostCard({ post }) {
         )}
       </Box>
 
-      {/* Post Content */}
       {post.content && (
         <Box sx={{ px: 2, pb: 2 }}>
           <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
@@ -173,7 +115,6 @@ export function PostCard({ post }) {
         </Box>
       )}
 
-      {/* Post Image */}
       {post.image && (
         <Box
           component="img"
@@ -188,7 +129,6 @@ export function PostCard({ post }) {
         />
       )}
 
-      {/* Post Actions */}
       <Box sx={{ p: 2 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -196,14 +136,13 @@ export function PostCard({ post }) {
               startIcon={isLiked ? <Favorite color="error" /> : <FavoriteBorder />}
               size="small"
               onClick={handleLike}
-              disabled={!user}
               sx={{ 
                 textTransform: 'none', 
                 color: isLiked ? 'error.main' : 'text.secondary',
                 fontWeight: isLiked ? 600 : 400
               }}
             >
-              {likesCount} {likesCount === 1 ? 'Like' : 'Likes'}
+              {likesCount + (isLiked ? 1 : 0)} {likesCount === 1 ? 'Like' : 'Likes'}
             </Button>
             <Button
               startIcon={<ChatBubbleOutline />}

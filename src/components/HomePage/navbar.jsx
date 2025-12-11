@@ -16,19 +16,9 @@ import {
   Divider
 } from '@mui/material';
 import { useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "@/redux/slices/authSlice";
-import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
-
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  // Lấy user trực tiếp từ slice auth
-  const { user } = useSelector((state) => state.auth);
+export default function Navbar({ user }) {
   const fullName = user?.user_metadata?.full_name || 'User';
-  // Lấy tối đa 2 chữ cái đầu để hiển thị trong Avatar (ví dụ: "Hoàng Bảo Lộc" => "H B" hoặc "HB")
   const initials = fullName
     .split(' ')
     .filter(Boolean)
@@ -36,17 +26,9 @@ export default function Navbar() {
     .slice(0, 2)
     .join('');
 
-  const handleLogout = async () => {
-    try {
-      await dispatch(logoutUser()).unwrap();
-      navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
-
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -62,6 +44,11 @@ export default function Navbar() {
 
   const handleSettings = () => {
     console.log('Navigate to Settings');
+    handleClose();
+  };
+
+  const handleLogout = () => {
+    console.log('Logout clicked');
     handleClose();
   };
 

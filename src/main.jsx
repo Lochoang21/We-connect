@@ -1,57 +1,36 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import RootLayout from "@pages/RootLayout";
 import ModalProvider from "@context/ModalProvider";
 import { lazy } from "react";
 import { ThemeProvider } from "@mui/material";
-import { Provider } from "react-redux";
-import { store } from "./redux/store";
-const HomePage = lazy(() => import("@pages/HomePage"));
 import theme from "./configs/muiConfig";
-import RegisterPage from "@pages/auth/RegisterPage";
 import AuthLayout from "@pages/auth/AuthLayout";
+import RegisterPage from "@pages/auth/RegisterPage";
 import LoginPage from "@pages/auth/LoginPage";
-import { ProtectedRoute } from '@/components/ProtectedRoute';
-import { PublicRoute } from '@/components/PublicRoute';
+import { Provider } from "react-redux";
+import store from "@redux/store";
+
+const HomePage = lazy(() => import("@pages/HomePage"));
 
 const router = createBrowserRouter([
   {
-    element: <RootLayout />,
+    path: "/",
+    element: <HomePage />
+  },
+  {
+    element: <AuthLayout />,
     children: [
       {
-        path: "/",
-        element: <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
+        path: "/register",
+        element: <RegisterPage />
       },
-      // {
-      //   path: "/profile/:userId",
-      //   element:  <ProtectedRoute>
-      //           <ProfilePage />
-      //         </ProtectedRoute>
-      // },
       {
-        element: <AuthLayout />,
-        children: [
-          {
-            path: "/register",
-            element: <PublicRoute>
-                <RegisterPage />
-              </PublicRoute>
-          },
-          {
-            path: "/login",
-            element:
-              <PublicRoute>
-                <LoginPage />
-              </PublicRoute>
-            
-          }
-        ],
-      },
-    ],
-  },
+        path: "/login",
+        element: <LoginPage />
+      }
+    ]
+  }
 ]);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
@@ -61,5 +40,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <RouterProvider router={router} />
       </ModalProvider>
     </ThemeProvider>
-  </Provider>,
+  </Provider>
 );

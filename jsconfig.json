@@ -4,14 +4,33 @@
     "module": "commonjs",
     "baseUrl": "./src",
     "paths": {
-      "@/*": ["*"],
-      "@components/*": ["components/*"],
-      "@pages/*": ["pages/*"],
-      "@assets/*": ["assets/*"],
-      "@utils/*": ["utils/*"],
-      "@libs/*": ["libs/*"],
-      "@context/*": ["context/*"],
-      "@redux/*": ["redux/*"]
+      "@/*": [
+        "*"
+      ],
+      "@components/*": [
+        "components/*"
+      ],
+      "@pages/*": [
+        "pages/*"
+      ],
+      "@assets/*": [
+        "assets/*"
+      ],
+      "@utils/*": [
+        "utils/*"
+      ],
+      "@libs/*": [
+        "libs/*"
+      ],
+      "@context/*": [
+        "context/*"
+      ],
+      "@redux/*": [
+        "redux/*"
+      ],
+      "@services/*": [
+        "services/*"
+      ]
     }
   }
 }

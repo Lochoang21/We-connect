@@ -1,32 +1,63 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts } from '@/redux/slices/postSlice';
 import { StoryCircles } from './story-circle';
 import { CreatePost } from './create-post';
 import { PostCard } from './post-card';
-import { postService } from '@/services/post.service';
-import { addPost } from '@/redux/slices/postSlice';
 
 export function MainFeedInfiniteScroll() {
-  const dispatch = useDispatch();
-  const { posts, loading, hasMore, page } = useSelector((state) => state.posts);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
   const observerTarget = useRef(null);
+
+  // Mock fetch posts function
+  const fetchMockPosts = useCallback((currentPage) => {
+    setLoading(true);
+
+    // Simulate API call
+    setTimeout(() => {
+      const newPosts = Array.from({ length: 10 }, (_, i) => ({
+        _id: `post-${currentPage}-${i}`,
+        content: `Sample post ${currentPage * 10 + i + 1}`,
+        image: i % 3 === 0 ? 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500' : null,
+        author: `user-${i}`,
+        likes: [],
+        comments: [],
+        created_at: new Date().toISOString(),
+        profiles: {
+          id: `user-${i}`,
+          full_name: `User ${i}`,
+          avatar_url: null
+        }
+      }));
+
+      setPosts(prev => [...prev, ...newPosts]);
+      setLoading(false);
+
+      // Simulate end of data after 5 pages
+      if (currentPage >= 4) {
+        setHasMore(false);
+      }
+    }, 1000);
+  }, []);
 
   // Initial load
   useEffect(() => {
     if (posts.length === 0) {
-      dispatch(fetchPosts({ page: 0, limit: 10 }));
+      fetchMockPosts(0);
     }
-  }, [dispatch, posts.length]);
+  }, [posts.length, fetchMockPosts]);
 
   // Infinite scroll observer
   const handleObserver = useCallback((entries) => {
     const [entry] = entries;
     if (entry.isIntersecting && hasMore && !loading) {
-      dispatch(fetchPosts({ page: page + 1, limit: 10 }));
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchMockPosts(nextPage);
     }
-  }, [hasMore, loading, page, dispatch]);
+  }, [hasMore, loading, page, fetchMockPosts]);
 
   useEffect(() => {
     const element = observerTarget.current;

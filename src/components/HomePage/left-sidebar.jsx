@@ -1,13 +1,18 @@
-import { Home, People, CalendarMonth, VideoLibrary, Photo, ShoppingBag, Description } from '@mui/icons-material';
-import { Avatar, Box, Button, Paper, Typography, Badge, Divider, Link } from '@mui/material';
-import { useSelector } from 'react-redux';
-
+import { Home, People, VideoLibrary, Photo, ShoppingBag } from '@mui/icons-material';
+import { Avatar, Box, Button, Paper, Typography, Badge } from '@mui/material';
 
 export default function LeftSidebar() {
+  // Mock user data
+  const mockUser = {
+    user_metadata: {
+      full_name: 'John Doe',
+      avatar_url: null
+    },
+    email: 'john.doe@example.com'
+  };
 
-  const user = useSelector((state) => state.auth?.user || null);
-  const fullName = user?.user_metadata?.full_name || 'User';
-  const email = user?.email || 'david@gmail.com';
+  const fullName = mockUser.user_metadata.full_name;
+  const email = mockUser.email;
 
   const initials = fullName
     .split(' ')
@@ -22,13 +27,6 @@ export default function LeftSidebar() {
     { icon: VideoLibrary, label: "Watch Videos", active: false, badge: null },
     { icon: Photo, label: "Photos", active: false, badge: null },
     { icon: ShoppingBag, label: "Marketplace", active: false, badge: null },
-  ];
-
-  const pages = [
-    { name: "UI/UX Community...", color: "#3b82f6" },
-    { name: "Web Designer", color: "#ec4899" },
-    { name: "Dribbble Community", color: "#f472b6" },
-    { name: "Behance ®", color: "#2563eb" },
   ];
 
   return (
@@ -105,34 +103,6 @@ export default function LeftSidebar() {
           );
         })}
       </Box>
-
-      {/* Pages You Like */}
-      {/* <Box>
-        <Typography variant="caption" fontWeight="600" color="text.secondary" sx={{ textTransform: 'uppercase', mb: 1.5, display: 'block' }}>
-          Pages You Like
-        </Typography>
-        <Box>
-          {pages.map((page) => (
-            <Button
-              key={page.name}
-              variant="text"
-              fullWidth
-              startIcon={
-                <Box sx={{ width: 32, height: 32, backgroundColor: page.color, borderRadius: 1 }} />
-              }
-              sx={{
-                justifyContent: 'flex-start',
-                gap: 1.5,
-                mb: 0.5,
-                textTransform: 'none',
-                color: 'text.primary'
-              }}
-            >
-              {page.name}
-            </Button>
-          ))}
-        </Box>
-      </Box> */}
     </Box>
   );
 }

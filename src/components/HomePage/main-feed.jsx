@@ -1,49 +1,40 @@
-import { useEffect, useState } from 'react';
-import { Box, CircularProgress, Typography, Button, Alert } from '@mui/material';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPosts, clearPosts } from '@/redux/slices/postSlice';
+import { Box, Typography } from '@mui/material';
 import { StoryCircles } from './story-circle';
 import { CreatePost } from './create-post';
 import { PostCard } from './post-card';
-import { Refresh } from '@mui/icons-material';
 
 export default function MainFeed() {
-  const dispatch = useDispatch();
-  const { posts, loading, error, hasMore, page } = useSelector((state) => state.posts);
-  const [refreshing, setRefreshing] = useState(false);
-
-  // Initial load
-  useEffect(() => {
-    dispatch(fetchPosts({ page: 0, limit: 10 }));
-  }, [dispatch]);
-
-  // useEffect(() => {
-  //   // Subscribe to new posts
-  //   const subscription = postService.subscribeToPostChanges((payload) => {
-  //     if (payload.eventType === 'INSERT') {
-  //       dispatch(addPost(payload.new));
-  //     }
-  //   });
-
-  //   return () => {
-  //     subscription.unsubscribe();
-  //   };
-  // }, [dispatch]);
-
-  // Load more posts
-  const handleLoadMore = () => {
-    if (hasMore && !loading) {
-      dispatch(fetchPosts({ page: page + 1, limit: 10 }));
+  // Mock posts data
+  const mockPosts = [
+    {
+      _id: '1',
+      content: 'This is a sample post! 🎉',
+      image: null,
+      author: 'user-1',
+      likes: ['user-2', 'user-3'],
+      comments: [],
+      created_at: new Date().toISOString(),
+      profiles: {
+        id: 'user-1',
+        full_name: 'Jane Smith',
+        avatar_url: null
+      }
+    },
+    {
+      _id: '2',
+      content: 'Beautiful day for coding! ☀️',
+      image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=500',
+      author: 'user-2',
+      likes: ['user-1'],
+      comments: [],
+      created_at: new Date(Date.now() - 3600000).toISOString(),
+      profiles: {
+        id: 'user-2',
+        full_name: 'Mike Johnson',
+        avatar_url: null
+      }
     }
-  };
-
-  // Refresh posts
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    dispatch(clearPosts());
-    await dispatch(fetchPosts({ page: 0, limit: 10 }));
-    setRefreshing(false);
-  };
+  ];
 
   return (
     <Box
@@ -60,79 +51,15 @@ export default function MainFeed() {
       <StoryCircles />
       <CreatePost />
 
-      {/* Refresh Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-        <Button
-          startIcon={<Refresh />}
-          onClick={handleRefresh}
-          disabled={refreshing}
-          size="small"
-          sx={{ textTransform: 'none' }}
-        >
-          {refreshing ? 'Refreshing...' : 'Refresh Feed'}
-        </Button>
-      </Box>
-
-      {/* Error State */}
-      {error && (
-        <Alert severity="error" onClose={() => dispatch(clearError())}>
-          {error}
-        </Alert>
-      )}
-
-      {/* Loading State - Initial */}
-      {loading && posts.length === 0 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
-        </Box>
-      )}
-
-      {/* Posts List */}
-      {posts.map((post) => (
+      {mockPosts.map((post) => (
         <PostCard key={post._id} post={post} />
       ))}
 
-      {/* Empty State */}
-      {!loading && posts.length === 0 && (
-        <Box sx={{ textAlign: 'center', py: 8 }}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No posts yet
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Be the first to share something!
-          </Typography>
-        </Box>
-      )}
-
-      {/* Load More Button */}
-      {hasMore && posts.length > 0 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 2 }}>
-          <Button
-            variant="outlined"
-            onClick={handleLoadMore}
-            disabled={loading}
-            sx={{ textTransform: 'none' }}
-          >
-            {loading ? (
-              <>
-                <CircularProgress size={16} sx={{ mr: 1 }} />
-                Loading...
-              </>
-            ) : (
-              'Load More'
-            )}
-          </Button>
-        </Box>
-      )}
-
-      {/* End of Posts */}
-      {!hasMore && posts.length > 0 && (
-        <Box sx={{ textAlign: 'center', py: 2 }}>
-          <Typography variant="body2" color="text.secondary">
-            You've reached the end
-          </Typography>
-        </Box>
-      )}
+      <Box sx={{ textAlign: 'center', py: 2 }}>
+        <Typography variant="body2" color="text.secondary">
+          End of feed
+        </Typography>
+      </Box>
     </Box>
   );
 }

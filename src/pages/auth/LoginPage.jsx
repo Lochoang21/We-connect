@@ -1,47 +1,28 @@
 import FormField from "@components/FormField";
 import TextInput from "@components/FormInputs/TextInput";
-import { Button, Alert } from "@mui/material";
+import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, clearError } from "@/redux/slices/authSlice";
-import { useEffect } from "react";
+import { login } from "@/redux/slices/authSlice";
 
 const LoginPage = () => {
   const { control, handleSubmit } = useForm();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error } = useSelector((state) => state.auth);
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
+  const { status, error } = useSelector((state) => state.auth);
 
   const onSubmit = async (data) => {
-    try {
-      await dispatch(loginUser({
-        email: data.email,
-        password: data.password,
-      })).unwrap();
-      
-      // ✅ PublicRoute sẽ tự redirect sau khi login success
-      navigate('/');
-    } catch (err) {
-      console.error("Login failed:", err);
+    const payload = { username: data.email, password: data.password };
+    const result = await dispatch(login(payload));
+    if (login.fulfilled.match(result)) {
+      navigate("/");
     }
   };
 
   return (
     <div>
       <p className="mb-5 text-center text-2xl font-bold">Login</p>
-      
-      {error && (
-        <Alert severity="error" className="mb-4">
-          {error}
-        </Alert>
-      )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormField
@@ -65,13 +46,16 @@ const LoginPage = () => {
           Component={TextInput}
           rules={{ required: "Password is required" }}
         />
-        <Button 
-          variant="contained" 
+        <Button
+          variant="contained"
           type="submit"
-          disabled={loading}
+          disabled={status === "loading"}
         >
-          {loading ? "Signing in..." : "Sign in"}
+          {status === "loading" ? "Signing in..." : "Sign in"}
         </Button>
+        {error && (
+          <p className="text-center text-red-600 text-sm">{error}</p>
+        )}
       </form>
       <p className="text-center mt-4">
         New on our platform?{" "}
