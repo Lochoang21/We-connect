@@ -30,6 +30,12 @@
       ],
       "@services/*": [
         "services/*"
+      ],
+      "@hooks/*": [
+        "hooks/*"
+      ],
+      "@routes/*": [
+        "routes/*"
       ]
     }
   }

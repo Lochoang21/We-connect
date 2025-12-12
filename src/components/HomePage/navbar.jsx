@@ -16,6 +16,10 @@ import {
   Divider
 } from '@mui/material';
 import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '@redux/slices/authSlice';
+import { useSnackbar } from '@context/SnackbarProvider';
 
 export default function Navbar({ user }) {
   const fullName = user?.user_metadata?.full_name || 'User';
@@ -28,6 +32,9 @@ export default function Navbar({ user }) {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { openSnackbar } = useSnackbar();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -48,8 +55,10 @@ export default function Navbar({ user }) {
   };
 
   const handleLogout = () => {
-    console.log('Logout clicked');
+    dispatch(logout());
     handleClose();
+    openSnackbar({ message: 'Đăng xuất thành công', severity: 'info' });
+    navigate('/login');
   };
 
   return (

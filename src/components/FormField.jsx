@@ -10,23 +10,19 @@ const FormField = ({ control, label, name, type, Component, rules }) => {
         name={name}
         control={control}
         rules={rules}
-        render={({ field: { onChange, value, name }, fieldState: { error } }) => {
-          return (
-            <>
-              <Component
-                onChange={onChange}
-                value={value}
-                name={name}
-                type={type}
-                control={control}
-                error={error}
-              />
-              {error && (
-                <p className="mt-1 text-sm text-red-500">{error.message}</p>
-              )}
-            </>
-          );
-        }}
+        render={({ field, fieldState: { error } }) => (
+          <>
+            <Component
+              {...field}
+              type={type}
+              control={control}
+              error={error}
+            />
+            {error && (
+              <p className="mt-1 text-sm text-red-500">{error.message}</p>
+            )}
+          </>
+        )}
       />
     </div>
   );

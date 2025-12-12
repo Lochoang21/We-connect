@@ -2,42 +2,22 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ModalProvider from "@context/ModalProvider";
-import { lazy } from "react";
+import SnackbarProvider from "@context/SnackbarProvider";
 import { ThemeProvider } from "@mui/material";
 import theme from "./configs/muiConfig";
-import AuthLayout from "@pages/auth/AuthLayout";
-import RegisterPage from "@pages/auth/RegisterPage";
-import LoginPage from "@pages/auth/LoginPage";
 import { Provider } from "react-redux";
 import store from "@redux/store";
+import routes from "@/routes/route";
 
-const HomePage = lazy(() => import("@pages/HomePage"));
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />
-  },
-  {
-    element: <AuthLayout />,
-    children: [
-      {
-        path: "/register",
-        element: <RegisterPage />
-      },
-      {
-        path: "/login",
-        element: <LoginPage />
-      }
-    ]
-  }
-]);
+const router = createBrowserRouter(routes);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <ThemeProvider theme={theme}>
       <ModalProvider>
-        <RouterProvider router={router} />
+        <SnackbarProvider>
+          <RouterProvider router={router} />
+        </SnackbarProvider>
       </ModalProvider>
     </ThemeProvider>
   </Provider>

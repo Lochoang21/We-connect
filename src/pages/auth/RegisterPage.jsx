@@ -1,16 +1,52 @@
 import FormField from "@components/FormField";
 import TextInput from "@components/FormInputs/TextInput";
+import RegisterOtpModal from "@/components/Auth/RegisterOtpModal";
 import { Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import api from "@services/api";
+import { useSnackbar } from "@context/SnackbarProvider";
 
 const RegisterPage = () => {
   const { control, handleSubmit } = useForm();
+  const [openOtpModal, setOpenOtpModal] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [registeredId, setRegisteredId] = useState(null);
+  const { openSnackbar } = useSnackbar();
 
-  const onSubmit = (data) => {
-    console.log('Register form data:', data);
-    // Mock register - chỉ log dữ liệu
-    alert(`Register with email: ${data.email}, name: ${data.fullName}`);
+  const onSubmit = async (data) => {
+    try {
+      const payload = {
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+      };
+
+      const res = await api.post("/auth/register", payload);
+      const { data: resData } = res.data || {};
+
+      if (!resData?.id) {
+        throw new Error("Invalid register response");
+      }
+
+      setRegisteredEmail(data.email);
+      setRegisteredId(resData.id);
+      setOpenOtpModal(true);
+
+      openSnackbar({
+        message: "Đăng ký thành công. Vui lòng kiểm tra email để lấy mã xác nhận.",
+        severity: "success",
+      });
+    } catch (error) {
+      const message =
+        error?.response?.data?.message ||
+        "Đăng ký thất bại. Vui lòng thử lại.";
+      openSnackbar({
+        message,
+        severity: "error",
+      });
+    }
   };
 
   return (
@@ -62,6 +98,13 @@ const RegisterPage = () => {
       <p className="text-center mt-4">
         Already have an account? <Link to="/login" className="text-primary">Sign in instead</Link>
       </p>
+
+      <RegisterOtpModal
+        open={openOtpModal}
+        email={registeredEmail}
+        registeredId={registeredId}
+        onClose={() => setOpenOtpModal(false)}
+      />
     </div>
   );
 };
