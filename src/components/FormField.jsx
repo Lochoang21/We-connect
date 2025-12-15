@@ -2,10 +2,10 @@
 import { Controller } from "react-hook-form";
 
 // Component prop is used in JSX below
-const FormField = ({ control, label, name, type, Component, rules }) => {
+const FormField = ({ control, label, name, type, Component, rules, icon }) => {
   return (
     <div>
-      <p className="mb-1 font-bold text-sm text-dark-100">{label}</p>
+      <p className="mb-2 font-semibold text-sm text-gray-700">{label}</p>
       <Controller
         name={name}
         control={control}
@@ -17,6 +17,7 @@ const FormField = ({ control, label, name, type, Component, rules }) => {
               type={type}
               control={control}
               error={error}
+              icon={icon}
             />
             {error && (
               <p className="mt-1 text-sm text-red-500">{error.message}</p>
